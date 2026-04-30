@@ -622,9 +622,41 @@ class _TaxiList extends StatelessWidget {
             SizedBox(
               height: 300,
               child: Center(
-                child: Text(l.noTaxi,
-                    style: const TextStyle(
-                        color: AppColors.textSecondary, fontSize: 14)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(
+                          Icons.local_taxi,
+                          size: 64,
+                          color: AppColors.textSecondary.withOpacity(0.4),
+                        ),
+                        // Diagonal "no" line across the icon
+                        Transform.rotate(
+                          angle: -0.785398, // -45 degrees in radians
+                          child: Container(
+                            width: 72,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: AppColors.textSecondary.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l.noTaxi,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
