@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:courtier/core/theme/app_font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -232,15 +233,15 @@ class _HomeViewState extends State<_HomeView>
                           GestureDetector(
                             onTap: () => context.push('/profile'),
                             child: Container(
-                              width: 40,
-                              height: 40,
+                              width: 50,
+                              height: 50,
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: AppColors.border),
                               ),
                               child: const Icon(Icons.person_outline,
-                                  color: AppColors.primary, size: 20),
+                                  color: AppColors.primary, size: 20* AppFontSizes.scale),
                             ),
                           ),
                         ],
@@ -256,7 +257,7 @@ class _HomeViewState extends State<_HomeView>
                     children: [
                       Expanded(
                         child: Container(
-                          height: 40,
+                          height: 50,
                           decoration: BoxDecoration(
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
@@ -272,13 +273,13 @@ class _HomeViewState extends State<_HomeView>
                               hintStyle: const TextStyle(
                                   color: AppColors.textSecondary, fontSize: 13),
                               prefixIcon: const Icon(Icons.search,
-                                  color: AppColors.textSecondary, size: 18),
+                                  color: AppColors.textSecondary, size: 16* AppFontSizes.scale),
                               suffixIcon: _searchQuery.isNotEmpty
                                   ? GestureDetector(
                                 onTap: _clearSearch,
                                 child: const Icon(Icons.close,
                                     color: AppColors.textSecondary,
-                                    size: 16),
+                                    size: 16* AppFontSizes.scale),
                               )
                                   : null,
                               border: InputBorder.none,
@@ -292,7 +293,7 @@ class _HomeViewState extends State<_HomeView>
                       GestureDetector(
                         onTap: () => _showLineSheet(lines),
                         child: Container(
-                          height: 40,
+                          height: 50,
                           padding:
                           const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(

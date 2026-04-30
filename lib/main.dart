@@ -9,6 +9,7 @@ import 'package:courtier/core/l10n/locale_notifier.dart';
 import 'package:courtier/core/router/router.dart';
 import 'package:courtier/core/services/sunmi_nfc_service.dart';
 import 'package:courtier/core/storage/local_storage.dart';
+import 'package:courtier/core/theme/app_font_sizes.dart';
 import 'package:courtier/core/theme/app_theme.dart';
 import 'package:courtier/features/auth/domain/repositories/auth_repository.dart';
 import 'package:courtier/features/auth/presentation/bloc/auth_bloc.dart';
@@ -120,6 +121,12 @@ class _TaxiDriverAppState extends State<TaxiDriverApp> {
               GlobalCupertinoLocalizations.delegate,
             ],
             routerConfig: _router,
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: const TextScaler.linear(AppFontSizes.scale),
+              ),
+              child: child!,
+            ),
           ),
         ),
       ),
