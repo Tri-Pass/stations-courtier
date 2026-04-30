@@ -1,6 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+    <uses-permission android:name="com.sunmi.perm.MSR" />
+    <uses-permission android:name="com.sunmi.perm.ICC" />
+    <uses-permission android:name="com.sunmi.perm.PINPAD" />
+    <uses-permission android:name="com.sunmi.perm.SECURITY" />
+    <uses-permission android:name="com.sunmi.perm.CONTACTLESS_CARD" />
     <application
-        android:label="courtier"
+        android:label="Pro Courtier"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

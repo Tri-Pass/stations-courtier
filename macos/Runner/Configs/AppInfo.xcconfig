@@ -8,7 +8,7 @@
 PRODUCT_NAME = courtier
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = ma.wetaxi.station.courtier
+PRODUCT_BUNDLE_IDENTIFIER = stations.courtier.wetaxi.ma.courtier
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 ma.wetaxi.station. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 stations.courtier.wetaxi.ma. All rights reserved.
