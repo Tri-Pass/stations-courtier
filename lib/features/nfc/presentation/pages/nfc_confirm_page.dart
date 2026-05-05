@@ -4,6 +4,7 @@ import 'package:courtier/core/di/injection.dart';
 import 'package:courtier/core/l10n/app_localizations.dart';
 import 'package:courtier/core/network/api_client.dart';
 import 'package:courtier/core/theme/app_theme.dart';
+import 'package:courtier/core/widgets/app_notification.dart';
 import 'package:courtier/features/queue/domain/entities/queue_entry.dart';
 import 'package:courtier/features/queue/domain/repositories/queue_repository.dart';
 
@@ -43,135 +44,19 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
         });
       }
     } on ApiException catch (e) {
-      if (mounted) { setState(() => _loading = false); _showError(e.message); }
+      if (mounted) { setState(() => _loading = false); showAppError(context, message: e.message); }
     } catch (_) {
       if (mounted) {
         setState(() => _loading = false);
-        _showError(AppLocalizations.of(context).connectionErrorShort);
+        showAppError(context, message: AppLocalizations.of(context).connectionErrorShort);
       }
     }
-  }
-
-  void _showError(String message) {
-    final l = AppLocalizations.of(context);
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => Dialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.border),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.red.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: AppColors.red.withValues(alpha: 0.3), width: 1.5),
-                ),
-                child:
-                    const Icon(Icons.nfc_rounded, color: AppColors.red, size: 32),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l.connectionErrorShort,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 13, height: 1.4),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.inputBg,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  widget.nfcTagId,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(ctx).pop();
-                        context.go('/home');
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textSecondary,
-                        side: const BorderSide(color: AppColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(l.cancel),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(ctx).pop();
-                        _loadData();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.black,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(l.retry,
-                          style:
-                              const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Future<void> _addToQueue() async {
     if (_driver == null) return;
     if (_selectedLine == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context).lineRequired),
-          backgroundColor: AppColors.red,
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+      showAppError(context, message: AppLocalizations.of(context).lineRequired);
       return;
     }
     setState(() => _adding = true);
@@ -179,101 +64,14 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
       await sl<QueueRepository>().enqueue(_driver!.id, _selectedLine!.id);
       if (mounted) context.go('/home');
     } on ApiException catch (e) {
-      if (mounted) _showEnqueueError(e.message);
+      if (mounted) showAppError(context, message: e.message);
     } catch (_) {
       if (mounted) {
-        _showEnqueueError(AppLocalizations.of(context).connectionErrorShort);
+        showAppError(context, message: AppLocalizations.of(context).connectionErrorShort);
       }
     } finally {
       if (mounted) setState(() => _adding = false);
     }
-  }
-
-  void _showEnqueueError(String message) {
-    final l = AppLocalizations.of(context);
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.border),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.red.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: AppColors.red.withValues(alpha: 0.3), width: 1.5),
-                ),
-                child: const Icon(Icons.queue_rounded,
-                    color: AppColors.red, size: 32),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l.addToQueue,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 13, height: 1.4),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(ctx).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textSecondary,
-                        side: const BorderSide(color: AppColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(l.cancel),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(ctx).pop();
-                        _addToQueue();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.black,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(l.retry,
-                          style:
-                              const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
