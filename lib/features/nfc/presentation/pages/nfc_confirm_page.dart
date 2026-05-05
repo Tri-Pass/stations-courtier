@@ -77,20 +77,20 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios,
-              color: Colors.white, size: 18),
+          icon: Icon(Icons.arrow_back_ios, color: c.textPrimary, size: 18),
           onPressed: () => context.go('/home'),
         ),
         title: Text(
           l.nfcDetected,
-          style: const TextStyle(
-              color: Colors.white,
+          style: TextStyle(
+              color: c.textPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w600),
         ),
@@ -114,8 +114,7 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                                 width: 64,
                                 height: 64,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.12),
+                                  color: AppColors.primary.withValues(alpha: 0.12),
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                       color: AppColors.primary, width: 1.5),
@@ -128,8 +127,8 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                             Center(
                               child: Text(
                                 l.nfcIdentified,
-                                style: const TextStyle(
-                                    color: AppColors.textSecondary,
+                                style: TextStyle(
+                                    color: c.textSecondary,
                                     fontSize: 12,
                                     letterSpacing: 0.4),
                               ),
@@ -154,8 +153,8 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                                 const SizedBox(width: 8),
                                 Text(
                                   l.selectLine,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: c.textPrimary,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.2,
@@ -165,8 +164,8 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                                 if (_lines.isNotEmpty)
                                   Text(
                                     '${_lines.length} ${l.lineLabel.toLowerCase()}s',
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
+                                    style: TextStyle(
+                                      color: c.textSecondary,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -176,12 +175,11 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
 
                             // ── Line cards ─────────────────────────────
                             if (_lines.isEmpty)
-                              const _EmptyLines()
+                              _EmptyLines()
                             else
                               ...(_lines.map((line) => _LineCard(
                                     line: line,
-                                    isSelected:
-                                        _selectedLine?.id == line.id,
+                                    isSelected: _selectedLine?.id == line.id,
                                     onTap: () => setState(
                                         () => _selectedLine = line),
                                   ))),
@@ -194,36 +192,13 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                     // ── Fixed bottom action ────────────────────────────
                     Container(
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                      decoration: const BoxDecoration(
-                        color: AppColors.background,
-                        border: Border(
-                            top: BorderSide(color: AppColors.border)),
+                      decoration: BoxDecoration(
+                        color: c.background,
+                        border: Border(top: BorderSide(color: c.border)),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // if (_selectedLine != null)
-                          //   Padding(
-                          //     padding: const EdgeInsets.only(bottom: 12),
-                          //     child: Row(
-                          //       children: [
-                          //         const Icon(Icons.check_circle_rounded,
-                          //             color: AppColors.primary, size: 16),
-                          //         const SizedBox(width: 6),
-                          //         Expanded(
-                          //           child: Text(
-                          //             _selectedLine!.label,
-                          //             style: const TextStyle(
-                          //               color: AppColors.primary,
-                          //               fontSize: 13,
-                          //               fontWeight: FontWeight.w600,
-                          //             ),
-                          //             overflow: TextOverflow.ellipsis,
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
                           SizedBox(
                             height: 52,
                             width: double.infinity,
@@ -255,8 +230,7 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                           TextButton(
                             onPressed: () => context.go('/home'),
                             child: Text(l.cancel,
-                                style: const TextStyle(
-                                    color: AppColors.textSecondary)),
+                                style: TextStyle(color: c.textSecondary)),
                           ),
                         ],
                       ),
@@ -276,23 +250,24 @@ class _DriverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         children: [
           _InfoRow(icon: Icons.confirmation_number_outlined, label: l.taxiNumberLabel, value: driver.taxiNumber),
-          const _Divider(),
+          _Divider(),
           _InfoRow(icon: Icons.person_outline, label: l.driverLabel, value: driver.name),
-          const _Divider(),
+          _Divider(),
           _InfoRow(icon: Icons.phone_outlined, label: l.phone, value: driver.phone),
-          const _Divider(),
+          _Divider(),
           _InfoRow(icon: Icons.location_on_outlined, label: l.destination, value: driver.destination),
-          const _Divider(),
+          _Divider(),
           _InfoRow(icon: Icons.event_seat_outlined, label: l.seats, value: '${driver.seatsTotal} ${l.seatsAvailable}'),
         ],
       ),
@@ -310,6 +285,7 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -320,12 +296,11 @@ class _InfoRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 11)),
+                  style: TextStyle(color: c.textSecondary, fontSize: 11)),
               const SizedBox(height: 2),
               Text(value,
-                  style: const TextStyle(
-                      color: Colors.white,
+                  style: TextStyle(
+                      color: c.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w600)),
             ],
@@ -340,7 +315,7 @@ class _Divider extends StatelessWidget {
   const _Divider();
   @override
   Widget build(BuildContext context) =>
-      const Divider(color: AppColors.border, height: 1, thickness: 1);
+      Divider(color: context.appColors.border, height: 1, thickness: 1);
 }
 
 // ─── Line card ────────────────────────────────────────────────────────────────
@@ -354,6 +329,7 @@ class _LineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -364,10 +340,10 @@ class _LineCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.07)
-              : AppColors.surface,
+              : c.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : c.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -382,9 +358,7 @@ class _LineCard extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                      color: isSelected ? AppColors.primary : c.textSecondary,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -395,7 +369,7 @@ class _LineCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primary.withValues(alpha: 0.5)
-                          : AppColors.border,
+                          : c.border,
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),
@@ -405,9 +379,7 @@ class _LineCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                        color: isSelected ? AppColors.primary : c.textSecondary,
                         width: 2,
                       ),
                     ),
@@ -425,9 +397,7 @@ class _LineCard extends StatelessWidget {
                   Text(
                     line.origin,
                     style: TextStyle(
-                      color: isSelected
-                          ? Colors.white
-                          : AppColors.textSecondary,
+                      color: isSelected ? c.textPrimary : c.textSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -436,13 +406,9 @@ class _LineCard extends StatelessWidget {
                   Text(
                     line.destination,
                     style: TextStyle(
-                      color: isSelected
-                          ? Colors.white
-                          : AppColors.textSecondary,
+                      color: isSelected ? c.textPrimary : c.textSecondary,
                       fontSize: 14,
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
                 ],
@@ -458,13 +424,10 @@ class _LineCard extends StatelessWidget {
                   width: 22,
                   height: 22,
                   decoration: BoxDecoration(
-                    color:
-                        isSelected ? AppColors.primary : Colors.transparent,
+                    color: isSelected ? AppColors.primary : Colors.transparent,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.border,
+                      color: isSelected ? AppColors.primary : c.border,
                       width: 1.5,
                     ),
                   ),
@@ -475,20 +438,17 @@ class _LineCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary.withValues(alpha: 0.15)
-                        : AppColors.inputBg,
+                        : c.inputBg,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${line.price} MAD',
                     style: TextStyle(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                      color: isSelected ? AppColors.primary : c.textSecondary,
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
@@ -509,17 +469,16 @@ class _EmptyLines extends StatelessWidget {
   const _EmptyLines();
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 32),
       alignment: Alignment.center,
-      child: const Column(
+      child: Column(
         children: [
-          Icon(Icons.route_outlined,
-              color: AppColors.textSecondary, size: 40),
-          SizedBox(height: 10),
+          Icon(Icons.route_outlined, color: c.textSecondary, size: 40),
+          const SizedBox(height: 10),
           Text('Aucune ligne disponible',
-              style: TextStyle(
-                  color: AppColors.textSecondary, fontSize: 13)),
+              style: TextStyle(color: c.textSecondary, fontSize: 13)),
         ],
       ),
     );

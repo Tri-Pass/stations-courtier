@@ -4,6 +4,7 @@ import 'package:courtier/core/di/injection.dart';
 import 'package:courtier/core/l10n/app_localizations.dart';
 import 'package:courtier/core/l10n/locale_notifier.dart';
 import 'package:courtier/core/theme/app_theme.dart';
+import 'package:courtier/core/theme/theme_notifier.dart';
 import 'package:courtier/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,24 +17,28 @@ class ProfilePage extends StatelessWidget {
       builder: (context, state) {
         final driver = state is AuthAuthenticated ? state.driver : null;
         final l = AppLocalizations.of(context);
+        final c = context.appColors;
         final name = driver?.name ?? 'Courtier';
         final phone = driver?.phone ?? '—';
         final station = driver?.station?.name ?? '—';
         final agentId = driver?.id ?? 'CTR-001';
 
         return Scaffold(
-          appBar: AppBar(title: Text(
-            l.profile,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+          appBar: AppBar(
+            title: Text(
+              l.profile,
+              style: TextStyle(
+                color: c.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 18),
-            onPressed: () => context.go('/home'),
-          ),),
-          backgroundColor: AppColors.background,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios, color: c.textPrimary, size: 18),
+              onPressed: () => context.go('/home'),
+            ),
+          ),
+          backgroundColor: c.background,
           body: SafeArea(
             child: ListView(
               padding: const EdgeInsets.all(20),
@@ -89,8 +94,8 @@ class ProfilePage extends StatelessWidget {
                 // ── Information ───────────────────────────────────────────
                 Text(
                   l.information,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: c.textPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),
@@ -102,11 +107,24 @@ class ProfilePage extends StatelessWidget {
                 _InfoRow(icon: Icons.badge, label: l.agentId, value: agentId),
                 const SizedBox(height: 28),
 
+                // ── Appearance / Theme ────────────────────────────────────
+                Text(
+                  l.theme,
+                  style: TextStyle(
+                    color: c.textPrimary,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const _ThemeSelector(),
+                const SizedBox(height: 28),
+
                 // ── Language ──────────────────────────────────────────────
                 Text(
                   l.language,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: c.textPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),
@@ -132,23 +150,24 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _confirmLogout(BuildContext context, AppLocalizations l) {
+    final c = context.appColors;
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           l.confirmLogoutTitle,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: c.textPrimary, fontWeight: FontWeight.bold),
         ),
         content: Text(
           l.confirmLogoutMsg,
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: c.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(l.cancel, style: const TextStyle(color: AppColors.textSecondary)),
+            child: Text(l.cancel, style: TextStyle(color: c.textSecondary)),
           ),
           TextButton(
             onPressed: () {
@@ -177,13 +196,14 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -201,16 +221,124 @@ class _InfoRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                Text(label, style: TextStyle(color: c.textSecondary, fontSize: 11)),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: c.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Theme selector ───────────────────────────────────────────────────────────
+
+class _ThemeSelector extends StatelessWidget {
+  const _ThemeSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    final notifier = sl<ThemeNotifier>();
+    final l = AppLocalizations.of(context);
+    final c = context.appColors;
+
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: notifier,
+      builder: (_, current, __) {
+        return Container(
+          decoration: BoxDecoration(
+            color: c.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: c.border),
+          ),
+          child: Column(
+            children: [
+              _ThemeOption(
+                icon: Icons.wb_sunny_rounded,
+                label: l.themeDay,
+                selected: current == ThemeMode.light,
+                onTap: () => notifier.setTheme(ThemeMode.light),
+              ),
+              Divider(height: 1, color: c.border),
+              _ThemeOption(
+                icon: Icons.nights_stay_rounded,
+                label: l.themeNight,
+                selected: current == ThemeMode.dark,
+                onTap: () => notifier.setTheme(ThemeMode.dark),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ThemeOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ThemeOption({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: selected ? AppColors.primary : c.textSecondary,
+              size: 24,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: selected ? AppColors.primary : c.textPrimary,
+                  fontSize: 15,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ),
+            if (selected)
+              Container(
+                width: 22,
+                height: 22,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.black, size: 14),
+              )
+            else
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: c.border, width: 1.5),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -225,15 +353,16 @@ class _LanguageSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final notifier = sl<LocaleNotifier>();
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
 
     return ValueListenableBuilder<Locale>(
       valueListenable: notifier,
       builder: (_, current, __) {
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: c.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: c.border),
           ),
           child: Column(
             children: [
@@ -243,7 +372,7 @@ class _LanguageSelector extends StatelessWidget {
                 selected: current.languageCode == 'fr',
                 onTap: () => notifier.setLocale(const Locale('fr')),
               ),
-              const Divider(height: 1, color: AppColors.border),
+              Divider(height: 1, color: c.border),
               _LangOption(
                 flag: '🇲🇦',
                 label: l.arabic,
@@ -276,6 +405,7 @@ class _LangOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -289,7 +419,7 @@ class _LangOption extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  color: selected ? AppColors.primary : Colors.white,
+                  color: selected ? AppColors.primary : c.textPrimary,
                   fontSize: 15,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -309,7 +439,7 @@ class _LangOption extends StatelessWidget {
                 height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.border, width: 1.5),
+                  border: Border.all(color: c.border, width: 1.5),
                 ),
               ),
           ],
@@ -336,9 +466,10 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDestructive ? AppColors.red : Colors.white;
-    final bgColor = isDestructive ? AppColors.red.withValues(alpha: 0.12) : AppColors.surface;
-    final borderColor = isDestructive ? AppColors.red.withValues(alpha: 0.3) : AppColors.border;
+    final c = context.appColors;
+    final color = isDestructive ? AppColors.red : c.textPrimary;
+    final bgColor = isDestructive ? AppColors.red.withValues(alpha: 0.12) : c.surface;
+    final borderColor = isDestructive ? AppColors.red.withValues(alpha: 0.3) : c.border;
 
     return GestureDetector(
       onTap: onTap,

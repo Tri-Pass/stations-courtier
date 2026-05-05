@@ -177,6 +177,12 @@ class AppLocalizations {
 
   String get appearance => _t('Apparence', 'المظهر');
 
+  String get theme       => _t('Thème', 'السمة');
+
+  String get themeDay    => _t('Mode jour ☀️', 'وضع النهار ☀️');
+
+  String get themeNight  => _t('Mode nuit 🌙', 'وضع الليل 🌙');
+
   String get about => _t('À propos', 'حول');
 
   String get version => _t('Version', 'الإصدار');

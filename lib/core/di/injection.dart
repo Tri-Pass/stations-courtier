@@ -3,6 +3,7 @@ import 'package:courtier/core/l10n/locale_notifier.dart';
 import 'package:courtier/core/network/api_client.dart';
 import 'package:courtier/core/network/socket_service.dart';
 import 'package:courtier/core/storage/local_storage.dart';
+import 'package:courtier/core/theme/theme_notifier.dart';
 import 'package:courtier/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:courtier/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:courtier/features/auth/domain/repositories/auth_repository.dart';
@@ -20,6 +21,11 @@ Future<void> setupDependencies() async {
   final localeNotifier = LocaleNotifier();
   await localeNotifier.init();
   sl.registerSingleton(localeNotifier);
+
+  // Theme
+  final themeNotifier = ThemeNotifier();
+  await themeNotifier.init();
+  sl.registerSingleton(themeNotifier);
 
   // Core infrastructure
   sl.registerLazySingleton(() => LocalStorage());

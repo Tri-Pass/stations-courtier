@@ -58,13 +58,11 @@ class _HomeViewState extends State<_HomeView>
   }
 
   void _onSearchChanged(String v) {
-    // Always update local search query — triggers rebuild → _applyFilters runs
     setState(() => _searchQuery = v);
 
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
       if (!mounted) return;
-      // Only hit the API when the query looks like a phone number
       final isPhone = RegExp(r'^\d{10,}$').hasMatch(v.trim());
       final newPhone = isPhone ? v.trim() : null;
       if (newPhone != _activePhoneFilter) {
@@ -110,9 +108,10 @@ class _HomeViewState extends State<_HomeView>
   }
 
   void _showLineSheet(List<Line> lines) {
+    final c = context.appColors;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -129,7 +128,7 @@ class _HomeViewState extends State<_HomeView>
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: c.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -145,7 +144,7 @@ class _HomeViewState extends State<_HomeView>
                     Navigator.pop(context);
                   },
                 ),
-                const Divider(color: AppColors.border, height: 1),
+                Divider(color: c.border, height: 1),
                 ...lines.map((line) => _LineOption(
                   label: line.label,
                   isSelected: _selectedLineId == line.id,
@@ -169,20 +168,15 @@ class _HomeViewState extends State<_HomeView>
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       body: SafeArea(
         child: BlocBuilder<QueueBloc, QueueState>(
           builder: (context, queueState) {
             final loaded =
             queueState is QueueLoaded ? queueState : null;
 
-            // Use allWaiting/allActive/allCompleted as the base for local filtering.
-            // These always hold the full unfiltered dataset so name/taxi search
-            // works correctly even when a line or phone API filter is active.
-            // When a line filter is active, the API has already filtered
-            // waiting/active/completed — use those directly.
-            // For text search only, filter the full unfiltered lists locally.
             final lineActive = _selectedLineId != null;
             final filteredWaiting = loaded != null
                 ? _applyTextSearch(lineActive ? loaded.waiting : loaded.allWaiting)
@@ -214,16 +208,16 @@ class _HomeViewState extends State<_HomeView>
                               children: [
                                 Text(
                                   driver?.station?.name ?? 'Station',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: c.textPrimary,
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
                                   driver?.name ?? '',
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
+                                  style: TextStyle(
+                                    color: c.textSecondary,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -236,12 +230,12 @@ class _HomeViewState extends State<_HomeView>
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                color: AppColors.surface,
+                                color: c.surface,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.border),
+                                border: Border.all(color: c.border),
                               ),
-                              child: const Icon(Icons.person_outline,
-                                  color: AppColors.primary, size: 20* AppFontSizes.scale),
+                              child: Icon(Icons.person_outline,
+                                  color: AppColors.primary, size: 20 * AppFontSizes.scale),
                             ),
                           ),
                         ],
@@ -259,27 +253,25 @@ class _HomeViewState extends State<_HomeView>
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: c.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(color: c.border),
                           ),
                           child: TextField(
                             controller: _searchController,
                             onChanged: _onSearchChanged,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 13),
+                            style: TextStyle(color: c.textPrimary, fontSize: 13),
                             decoration: InputDecoration(
                               hintText: l.searchDriver,
-                              hintStyle: const TextStyle(
-                                  color: AppColors.textSecondary, fontSize: 13),
-                              prefixIcon: const Icon(Icons.search,
-                                  color: AppColors.textSecondary, size: 16* AppFontSizes.scale),
+                              hintStyle: TextStyle(color: c.textSecondary, fontSize: 13),
+                              prefixIcon: Icon(Icons.search,
+                                  color: c.textSecondary, size: 16 * AppFontSizes.scale),
                               suffixIcon: _searchQuery.isNotEmpty
                                   ? GestureDetector(
                                 onTap: _clearSearch,
-                                child: const Icon(Icons.close,
-                                    color: AppColors.textSecondary,
-                                    size: 16* AppFontSizes.scale),
+                                child: Icon(Icons.close,
+                                    color: c.textSecondary,
+                                    size: 16 * AppFontSizes.scale),
                               )
                                   : null,
                               border: InputBorder.none,
@@ -299,12 +291,12 @@ class _HomeViewState extends State<_HomeView>
                           decoration: BoxDecoration(
                             color: _selectedLineId != null
                                 ? AppColors.primary.withValues(alpha: 0.15)
-                                : AppColors.surface,
+                                : c.surface,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: _selectedLineId != null
                                   ? AppColors.primary
-                                  : AppColors.border,
+                                  : c.border,
                             ),
                           ),
                           child: Row(
@@ -315,7 +307,7 @@ class _HomeViewState extends State<_HomeView>
                                 size: 16,
                                 color: _selectedLineId != null
                                     ? AppColors.primary
-                                    : AppColors.textSecondary,
+                                    : c.textSecondary,
                               ),
                               const SizedBox(width: 5),
                               Text(
@@ -323,7 +315,7 @@ class _HomeViewState extends State<_HomeView>
                                 style: TextStyle(
                                   color: _selectedLineId != null
                                       ? AppColors.primary
-                                      : AppColors.textSecondary,
+                                      : c.textSecondary,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -359,16 +351,16 @@ class _HomeViewState extends State<_HomeView>
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: c.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: c.border),
                   ),
                   child: TabBar(
                     controller: _tabController,
                     indicator: BoxDecoration(
-                      color: AppColors.inputBg,
+                      color: c.inputBg,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: c.border),
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
@@ -447,16 +439,14 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.wifi_off_rounded,
-              color: AppColors.textSecondary, size: 48),
+          Icon(Icons.wifi_off_rounded, color: c.textSecondary, size: 48),
           const SizedBox(height: 12),
-          Text(message,
-              style: const TextStyle(
-                  color: AppColors.textSecondary, fontSize: 14)),
+          Text(message, style: TextStyle(color: c.textSecondary, fontSize: 14)),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: onRetry,
@@ -483,8 +473,7 @@ class _FilterChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border:
-        Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -503,8 +492,7 @@ class _FilterChip extends StatelessWidget {
           const SizedBox(width: 6),
           GestureDetector(
               onTap: onRemove,
-              child: const Icon(Icons.close,
-                  size: 14, color: AppColors.primary)),
+              child: const Icon(Icons.close, size: 14, color: AppColors.primary)),
         ],
       ),
     );
@@ -517,33 +505,28 @@ class _LineOption extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   const _LineOption(
-      {required this.label,
-        required this.isSelected,
-        required this.onTap});
+      {required this.label, required this.isSelected, required this.onTap});
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding:
-        const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? AppColors.primary : Colors.white,
+                  color: isSelected ? AppColors.primary : c.textPrimary,
                   fontSize: 15,
-                  fontWeight: isSelected
-                      ? FontWeight.w600
-                      : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_rounded,
-                  color: AppColors.primary, size: 20),
+              const Icon(Icons.check_rounded, color: AppColors.primary, size: 20),
           ],
         ),
       ),
@@ -560,6 +543,7 @@ class _TabLabel extends StatelessWidget {
       {required this.label, required this.color, required this.count});
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Tab(
       height: 36,
       child: Row(
@@ -569,14 +553,13 @@ class _TabLabel extends StatelessWidget {
           Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                  color: color, shape: BoxShape.circle)),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 5),
           Flexible(
             child: Text(
               label,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: c.textPrimary,
                   fontSize: 10,
                   fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
@@ -584,8 +567,7 @@ class _TabLabel extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
             decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8)),
@@ -607,12 +589,11 @@ class _TaxiList extends StatelessWidget {
   final bool showSeats;
   final Future<void> Function() onRefresh;
   const _TaxiList(
-      {required this.entries,
-        required this.showSeats,
-        required this.onRefresh});
+      {required this.entries, required this.showSeats, required this.onRefresh});
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     if (entries.isEmpty) {
       return RefreshIndicator(
         onRefresh: onRefresh,
@@ -631,16 +612,15 @@ class _TaxiList extends StatelessWidget {
                         Icon(
                           Icons.local_taxi,
                           size: 64,
-                          color: AppColors.textSecondary.withOpacity(0.4),
+                          color: c.textSecondary.withValues(alpha: 0.4),
                         ),
-                        // Diagonal "no" line across the icon
                         Transform.rotate(
-                          angle: -0.785398, // -45 degrees in radians
+                          angle: -0.785398,
                           child: Container(
                             width: 72,
                             height: 3,
                             decoration: BoxDecoration(
-                              color: AppColors.textSecondary.withOpacity(0.6),
+                              color: c.textSecondary.withValues(alpha: 0.6),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -650,10 +630,7 @@ class _TaxiList extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       l.noTaxi,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: c.textSecondary, fontSize: 14),
                     ),
                   ],
                 ),
@@ -684,13 +661,14 @@ class _TaxiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -699,8 +677,8 @@ class _TaxiCard extends StatelessWidget {
             children: [
               Text(
                 '🚕 ${entry.taxiNumber}',
-                style: const TextStyle(
-                    color: Colors.white,
+                style: TextStyle(
+                    color: c.textPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 15),
               ),
@@ -713,15 +691,11 @@ class _TaxiCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          _InfoRow(
-              icon: '👤',
-              text: '${l.driverLabel}: ${entry.driverName}'),
+          _InfoRow(icon: '👤', text: '${l.driverLabel}: ${entry.driverName}'),
           const SizedBox(height: 6),
           _InfoRow(icon: '📞', text: entry.driverPhone),
           const SizedBox(height: 6),
-          _InfoRow(
-              icon: '📍',
-              text: '${entry.lineOrigin} → ${entry.lineDestination}'),
+          _InfoRow(icon: '📍', text: '${entry.lineOrigin} → ${entry.lineDestination}'),
         ],
       ),
     );
@@ -734,14 +708,13 @@ class _InfoRow extends StatelessWidget {
   const _InfoRow({required this.icon, required this.text});
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Row(
       children: [
         Text(icon, style: const TextStyle(fontSize: 13)),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(text,
-              style: const TextStyle(
-                  color: AppColors.textSecondary, fontSize: 13)),
+          child: Text(text, style: TextStyle(color: c.textSecondary, fontSize: 13)),
         ),
       ],
     );
@@ -755,30 +728,29 @@ class _SeatDots extends StatelessWidget {
   const _SeatDots({required this.occupied, required this.total});
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Row(
       children: [
         ...List.generate(
             total,
-                (i) => Container(
+            (i) => Container(
               width: 14,
               height: 14,
               margin: const EdgeInsets.only(right: 3),
               decoration: BoxDecoration(
-                color: i < occupied
-                    ? const Color(0xFF4CAF7D)
-                    : AppColors.inputBg,
+                color: i < occupied ? const Color(0xFF4CAF7D) : c.inputBg,
                 shape: BoxShape.circle,
                 border: Border.all(
                     color: i < occupied
                         ? const Color(0xFF4CAF7D)
-                        : AppColors.border),
+                        : c.border),
               ),
             )),
         const SizedBox(width: 4),
         Text(
           '$occupied/$total',
-          style: const TextStyle(
-              color: AppColors.textSecondary,
+          style: TextStyle(
+              color: c.textSecondary,
               fontSize: 12,
               fontWeight: FontWeight.w600),
         ),
