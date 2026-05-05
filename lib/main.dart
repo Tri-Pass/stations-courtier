@@ -7,6 +7,7 @@ import 'package:courtier/core/di/injection.dart';
 import 'package:courtier/core/l10n/app_localizations.dart';
 import 'package:courtier/core/l10n/locale_notifier.dart';
 import 'package:courtier/core/router/router.dart';
+import 'package:courtier/core/theme/theme_notifier.dart';
 import 'package:courtier/core/services/sunmi_nfc_service.dart';
 import 'package:courtier/core/storage/local_storage.dart';
 import 'package:courtier/core/theme/app_font_sizes.dart';
@@ -106,26 +107,31 @@ class _TaxiDriverAppState extends State<TaxiDriverApp> {
             _router.go('/home');
           }
         },
-        child: ValueListenableBuilder<Locale>(
-          valueListenable: sl<LocaleNotifier>(),
-          builder: (_, locale, __) => MaterialApp.router(
-            title: 'wetaxi.courtier',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.darkTheme,
-            locale: locale,
-            supportedLocales: AppLocalizations.supportedLocales,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            routerConfig: _router,
-            builder: (context, child) => MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: const TextScaler.linear(AppFontSizes.scale),
+        child: ValueListenableBuilder<ThemeMode>(
+          valueListenable: sl<ThemeNotifier>(),
+          builder: (_, themeMode, __) => ValueListenableBuilder<Locale>(
+            valueListenable: sl<LocaleNotifier>(),
+            builder: (_, locale, __) => MaterialApp.router(
+              title: 'wetaxi.courtier',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              locale: locale,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              routerConfig: _router,
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: const TextScaler.linear(AppFontSizes.scale),
+                ),
+                child: child!,
               ),
-              child: child!,
             ),
           ),
         ),

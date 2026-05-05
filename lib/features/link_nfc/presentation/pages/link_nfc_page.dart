@@ -37,7 +37,6 @@ class _LinkNfcPageState extends State<LinkNfcPage> {
   @override
   void initState() {
     super.initState();
-    // Reset driver card if user edits the phone after a result
     _phoneCtrl.addListener(_onPhoneEdited);
   }
 
@@ -249,6 +248,7 @@ class _SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     final hasDriver = driver != null;
 
     return _PageShell(
@@ -265,13 +265,12 @@ class _SearchPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             l.searchDriverPhone,
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(color: c.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
-          Text(l.searchByPhone, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+          Text(l.searchByPhone, style: TextStyle(color: c.textSecondary, fontSize: 14)),
           const SizedBox(height: 28),
 
-          // Full-width phone input
           _InputBox(
             controller: phoneCtrl,
             focusNode: phoneFocus,
@@ -284,7 +283,6 @@ class _SearchPage extends StatelessWidget {
 
           if (error != null) ...[const SizedBox(height: 14), _ErrorBanner(message: error!)],
 
-          // Driver card (slides in after search)
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 320),
             transitionBuilder: (child, anim) => FadeTransition(
@@ -332,6 +330,7 @@ class _ScanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     final detected = nfcTagId != null;
 
     return _PageShell(
@@ -344,15 +343,12 @@ class _ScanPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Compact driver card at top
           _DriverCardCompact(driver: driver),
           const SizedBox(height: 36),
 
-          // NFC animation
           _NfcRadar(detected: detected),
           const SizedBox(height: 24),
 
-          // Status
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: detected
@@ -384,12 +380,12 @@ class _ScanPage extends StatelessWidget {
                       Text(
                         l.scanNfcInstruction,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: c.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         l.scanNfcWaiting,
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        style: TextStyle(color: c.textSecondary, fontSize: 13),
                       ),
                     ],
                   ),
@@ -429,6 +425,7 @@ class _OtpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
 
     return _PageShell(
       header: _Header(title: l.stepOtp, step: 3, total: 3, onBack: onBack),
@@ -442,28 +439,26 @@ class _OtpPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Summary: driver + NFC tag
           _DriverCardCompact(driver: driver),
           const SizedBox(height: 10),
           _NfcTagRow(tagId: nfcTagId),
           const SizedBox(height: 28),
 
-          // OTP info
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: c.border),
             ),
             child: Row(
               children: [
-                const Icon(Icons.sms_rounded, color: AppColors.textSecondary, size: 18),
+                Icon(Icons.sms_rounded, color: c.textSecondary, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     '${l.otpSentInfo} ${driver.phone}',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                    style: TextStyle(color: c.textSecondary, fontSize: 13),
                   ),
                 ),
               ],
@@ -471,10 +466,9 @@ class _OtpPage extends StatelessWidget {
           ),
           const SizedBox(height: 28),
 
-          Text(l.enterOtp, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+          Text(l.enterOtp, style: TextStyle(color: c.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 16),
 
-          // 4-box OTP input
           Center(child: _OtpBoxes(value: otpValue, onChanged: onChanged)),
 
           if (error != null) ...[const SizedBox(height: 20), _ErrorBanner(message: error!)],
@@ -520,15 +514,15 @@ class _SuccessPageState extends State<_SuccessPage> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               const Spacer(),
-              // Animated checkmark
               AnimatedBuilder(
                 animation: _ctrl,
                 builder: (_, __) => FadeTransition(
@@ -552,17 +546,16 @@ class _SuccessPageState extends State<_SuccessPage> with SingleTickerProviderSta
               Text(
                 l.linkSuccess,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(color: c.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
                 l.linkSuccessSubtitle,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                style: TextStyle(color: c.textSecondary, fontSize: 14),
               ),
               const SizedBox(height: 32),
 
-              // Driver + tag summary
               _DriverCard(driver: widget.driver),
               const SizedBox(height: 10),
               _NfcTagRow(tagId: widget.nfcTagId),
@@ -603,7 +596,7 @@ class _PageShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -637,16 +630,17 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 12, 20, 12),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.border, width: 0.5)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: c.border, width: 0.5)),
       ),
       child: Row(
         children: [
           if (onBack != null)
             IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.textPrimary, size: 18),
               onPressed: onBack,
             )
           else
@@ -654,15 +648,14 @@ class _Header extends StatelessWidget {
           const Icon(Icons.nfc_rounded, color: AppColors.primary, size: 20),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(title, style: TextStyle(color: c.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
           ),
-          // Step badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: c.border),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -674,11 +667,7 @@ class _Header extends StatelessWidget {
                   height: 8,
                   margin: const EdgeInsets.symmetric(horizontal: 2),
                   decoration: BoxDecoration(
-                    color: done
-                        ? AppColors.primary
-                        : active
-                            ? AppColors.primary
-                            : AppColors.border,
+                    color: done || active ? AppColors.primary : c.border,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -710,18 +699,19 @@ class _NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return SizedBox(
       width: double.infinity,
       height: 52,
       child: ElevatedButton(
         onPressed: enabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: enabled ? AppColors.primary : AppColors.surface,
-          foregroundColor: enabled ? Colors.black : AppColors.textSecondary,
+          backgroundColor: enabled ? AppColors.primary : c.surface,
+          foregroundColor: enabled ? Colors.black : c.textSecondary,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
-            side: BorderSide(color: enabled ? Colors.transparent : AppColors.border),
+            side: BorderSide(color: enabled ? Colors.transparent : c.border),
           ),
         ),
         child: loading
@@ -747,6 +737,7 @@ class _DriverCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
     final initials = driver.name.isNotEmpty
         ? driver.name.trim().split(' ').take(2).map((w) => w[0].toUpperCase()).join()
         : '?';
@@ -754,14 +745,13 @@ class _DriverCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: avatar + name/phone + NFC badge
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -786,49 +776,42 @@ class _DriverCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(driver.name,
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: c.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.phone_outlined,
-                            color: AppColors.textSecondary, size: 13),
+                        Icon(Icons.phone_outlined, color: c.textSecondary, size: 13),
                         const SizedBox(width: 4),
                         Text(driver.phone,
-                            style: const TextStyle(
-                                color: AppColors.textSecondary, fontSize: 13)),
+                            style: TextStyle(color: c.textSecondary, fontSize: 13)),
                       ],
                     ),
                     if (driver.driverCode.isNotEmpty) ...[
                       const SizedBox(height: 3),
                       Row(
                         children: [
-                          const Icon(Icons.badge_outlined,
-                              color: AppColors.textSecondary, size: 13),
+                          Icon(Icons.badge_outlined, color: c.textSecondary, size: 13),
                           const SizedBox(width: 4),
                           Text('${l.driverCode} : ${driver.driverCode}',
-                              style: const TextStyle(
-                                  color: AppColors.textSecondary, fontSize: 12)),
+                              style: TextStyle(color: c.textSecondary, fontSize: 12)),
                         ],
                       ),
                     ],
                   ],
                 ),
               ),
-              // NFC linked status
               _NfcLinkedBadge(linked: driver.nfcLinked),
             ],
           ),
 
-          // Divider
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(color: AppColors.border, height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(color: c.border, height: 1),
           ),
 
-          // Bottom row: taxi number + plate number
           Row(
             children: [
               if (driver.taxiNumber != null && driver.taxiNumber!.isNotEmpty)
@@ -848,7 +831,7 @@ class _DriverCard extends StatelessWidget {
                   icon: Icons.credit_card_rounded,
                   label: l.plateNumber,
                   value: driver.plateNumber!,
-                  color: AppColors.textSecondary,
+                  color: AppColors.primary,
                 ),
             ],
           ),
@@ -865,7 +848,7 @@ class _NfcLinkedBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final color = linked ? const Color(0xFF4CAF7D) : AppColors.textSecondary;
+    final color = linked ? const Color(0xFF4CAF7D) : context.appColors.textSecondary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -876,16 +859,11 @@ class _NfcLinkedBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            linked ? Icons.nfc_rounded : Icons.nfc_rounded,
-            color: color,
-            size: 13,
-          ),
+          Icon(Icons.nfc_rounded, color: color, size: 13),
           const SizedBox(width: 4),
           Text(
             linked ? l.nfcLinkedBadge : l.nfcNotLinkedBadge,
-            style: TextStyle(
-                color: color, fontSize: 11, fontWeight: FontWeight.w600),
+            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -898,21 +876,23 @@ class _InfoPill extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _InfoPill(
-      {required this.icon,
-      required this.label,
-      required this.value,
-      required this.color});
+  const _InfoPill({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.inputBg,
+          color: c.inputBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: c.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -921,15 +901,13 @@ class _InfoPill extends StatelessWidget {
               children: [
                 Icon(icon, color: color, size: 13),
                 const SizedBox(width: 4),
-                Text(label,
-                    style: const TextStyle(
-                        color: AppColors.textSecondary, fontSize: 10)),
+                Text(label, style: TextStyle(color: c.textSecondary, fontSize: 10)),
               ],
             ),
             const SizedBox(height: 3),
             Text(value,
                 style: TextStyle(
-                    color: color == AppColors.primary ? Colors.white : Colors.white,
+                    color: c.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600)),
           ],
@@ -947,6 +925,7 @@ class _DriverCardCompact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     final initials = driver.name.isNotEmpty
         ? driver.name.trim().split(' ').take(2).map((w) => w[0].toUpperCase()).join()
         : '?';
@@ -954,9 +933,9 @@ class _DriverCardCompact extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -971,8 +950,8 @@ class _DriverCardCompact extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(driver.name, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                Text(driver.phone, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                Text(driver.name, style: TextStyle(color: c.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
+                Text(driver.phone, style: TextStyle(color: c.textSecondary, fontSize: 12)),
               ],
             ),
           ),
@@ -1137,7 +1116,6 @@ class _OtpBoxesState extends State<_OtpBoxes> {
     super.initState();
     _ctrl.text = widget.value;
     _ctrl.addListener(() => widget.onChanged(_ctrl.text));
-    // Auto-focus
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _focus.requestFocus();
     });
@@ -1160,12 +1138,12 @@ class _OtpBoxesState extends State<_OtpBoxes> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return GestureDetector(
       onTap: () => _focus.requestFocus(),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Hidden capture field
           Opacity(
             opacity: 0,
             child: SizedBox(
@@ -1181,45 +1159,44 @@ class _OtpBoxesState extends State<_OtpBoxes> {
               ),
             ),
           ),
-          // Visual boxes — always LTR so Arabic RTL doesn't flip digit order
           Directionality(
             textDirection: TextDirection.ltr,
             child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(4, (i) {
-              final char = i < widget.value.length ? widget.value[i] : null;
-              final isCursor = i == widget.value.length;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: 60,
-                height: 70,
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                decoration: BoxDecoration(
-                  color: char != null
-                      ? AppColors.primary.withValues(alpha: 0.08)
-                      : AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(4, (i) {
+                final char = i < widget.value.length ? widget.value[i] : null;
+                final isCursor = i == widget.value.length;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 60,
+                  height: 70,
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  decoration: BoxDecoration(
                     color: char != null
-                        ? AppColors.primary
-                        : isCursor
-                            ? AppColors.primary.withValues(alpha: 0.5)
-                            : AppColors.border,
-                    width: char != null || isCursor ? 2 : 1,
+                        ? AppColors.primary.withValues(alpha: 0.08)
+                        : c.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: char != null
+                          ? AppColors.primary
+                          : isCursor
+                              ? AppColors.primary.withValues(alpha: 0.5)
+                              : c.border,
+                      width: char != null || isCursor ? 2 : 1,
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: char != null
-                      ? Text(
-                          char,
-                          style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                        )
-                      : Container(width: 14, height: 2, color: isCursor ? AppColors.primary : AppColors.border),
-                ),
-              );
-            }),
+                  child: Center(
+                    child: char != null
+                        ? Text(
+                            char,
+                            style: TextStyle(color: c.textPrimary, fontSize: 28, fontWeight: FontWeight.bold),
+                          )
+                        : Container(width: 14, height: 2, color: isCursor ? AppColors.primary : c.border),
+                  ),
+                );
+              }),
+            ),
           ),
-          ),  // Directionality
         ],
       ),
     );
@@ -1249,12 +1226,13 @@ class _InputBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: c.border),
       ),
       child: TextField(
         controller: controller,
@@ -1262,11 +1240,11 @@ class _InputBox extends StatelessWidget {
         keyboardType: inputType,
         inputFormatters: formatters,
         onSubmitted: onSubmitted,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+        style: TextStyle(color: c.textPrimary, fontSize: 16),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.textSecondary),
-          prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
+          hintStyle: TextStyle(color: c.textSecondary),
+          prefixIcon: Icon(icon, color: c.textSecondary, size: 20),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),

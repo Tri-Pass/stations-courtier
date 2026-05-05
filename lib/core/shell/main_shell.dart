@@ -13,20 +13,21 @@ class MainShell extends StatelessWidget {
     final location = GoRouterState.of(context).uri.toString();
     final currentIndex = location.startsWith('/link-nfc') ? 1 : 0;
     final l = AppLocalizations.of(context);
+    final c = context.appColors;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       body: child,
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          border: Border(top: BorderSide(color: AppColors.border, width: 0.8)),
+        decoration: BoxDecoration(
+          color: c.surface,
+          border: Border(top: BorderSide(color: c.border, width: 0.8)),
         ),
         child: BottomNavigationBar(
           currentIndex: currentIndex,
           backgroundColor: Colors.transparent,
           selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
+          unselectedItemColor: c.textSecondary,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           iconSize: 18 * AppFontSizes.scale,

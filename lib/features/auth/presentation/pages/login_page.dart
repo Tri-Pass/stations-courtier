@@ -41,6 +41,7 @@ class _LoginViewState extends State<_LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) context.go('/home');
@@ -49,7 +50,7 @@ class _LoginViewState extends State<_LoginView> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: c.background,
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -62,7 +63,6 @@ class _LoginViewState extends State<_LoginView> {
                   SizedBox(
                     width: 88,
                     height: 88,
-
                     child: Image.asset('assets/icons/logo-wetaxi.png',
                         width: 32, height: 32),
                   ),
@@ -83,8 +83,8 @@ class _LoginViewState extends State<_LoginView> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       AppLocalizations.of(context).login,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: c.textPrimary,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -95,7 +95,7 @@ class _LoginViewState extends State<_LoginView> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       AppLocalizations.of(context).loginSubtitle,
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      style: TextStyle(color: c.textSecondary, fontSize: 13),
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -125,7 +125,7 @@ class _LoginViewState extends State<_LoginView> {
                         _obscure
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
-                        color: AppColors.textSecondary,
+                        color: c.textSecondary,
                         size: 20,
                       ),
                     ),
@@ -204,11 +204,12 @@ class _Field extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.appColors;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
         label,
-        style: const TextStyle(
-          color: AppColors.textSecondary,
+        style: TextStyle(
+          color: c.textSecondary,
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
@@ -219,21 +220,21 @@ class _Field extends StatelessWidget {
         keyboardType: keyboardType,
         obscureText: obscure,
         onSubmitted: onSubmitted,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
+        style: TextStyle(color: c.textPrimary, fontSize: 15),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.textSecondary),
+          hintStyle: TextStyle(color: c.textSecondary),
           filled: true,
-          fillColor: AppColors.inputBg,
-          prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
+          fillColor: c.inputBg,
+          prefixIcon: Icon(icon, color: c.textSecondary, size: 20),
           suffixIcon: suffixIcon,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.border),
+            borderSide: BorderSide(color: c.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.border),
+            borderSide: BorderSide(color: c.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
