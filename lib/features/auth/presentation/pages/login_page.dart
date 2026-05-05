@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:courtier/core/l10n/app_localizations.dart';
 import 'package:courtier/core/theme/app_theme.dart';
+import 'package:courtier/core/widgets/app_notification.dart';
 import 'package:courtier/features/auth/presentation/bloc/auth_bloc.dart';
 
 class LoginPage extends StatelessWidget {
@@ -44,11 +45,7 @@ class _LoginViewState extends State<_LoginView> {
       listener: (context, state) {
         if (state is AuthAuthenticated) context.go('/home');
         if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(state.message),
-            backgroundColor: AppColors.red,
-            behavior: SnackBarBehavior.floating,
-          ));
+          showAppError(context, message: state.message);
         }
       },
       child: Scaffold(
