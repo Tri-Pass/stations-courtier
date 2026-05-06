@@ -22,6 +22,7 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
   Line? _selectedLine;
   bool _loading = true;
   bool _adding = false;
+  String? _error;
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _loading = true);
+    setState(() { _loading = true; _error = null; });
     try {
       final results = await Future.wait([
         sl<QueueRepository>().lookupByNfc(widget.nfcTagId),
@@ -44,11 +45,15 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
         });
       }
     } on ApiException catch (e) {
-      if (mounted) { setState(() => _loading = false); showAppError(context, message: e.message); }
+      if (mounted) {
+        setState(() { _loading = false; _error = e.message; });
+        showAppError(context, message: e.message);
+      }
     } catch (_) {
       if (mounted) {
-        setState(() => _loading = false);
-        showAppError(context, message: AppLocalizations.of(context).connectionErrorShort);
+        final msg = AppLocalizations.of(context).connectionErrorShort;
+        setState(() { _loading = false; _error = msg; });
+        showAppError(context, message: msg);
       }
     }
   }
@@ -99,7 +104,9 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
           ? const Center(
               child: CircularProgressIndicator(color: AppColors.primary))
           : _driver == null
-              ? const SizedBox.shrink()
+              ? _error != null
+                  ? _ErrorView(message: _error!, onRetry: _loadData)
+                  : const SizedBox.shrink()
               : Column(
                   children: [
                     Expanded(
@@ -175,7 +182,7 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
 
                             // ── Line cards ─────────────────────────────
                             if (_lines.isEmpty)
-                              _EmptyLines()
+                              const _EmptyLines()
                             else
                               ...(_lines.map((line) => _LineCard(
                                     line: line,
@@ -261,13 +268,13 @@ class _DriverCard extends StatelessWidget {
       child: Column(
         children: [
           _InfoRow(icon: Icons.confirmation_number_outlined, label: l.taxiNumberLabel, value: driver.taxiNumber),
-          _Divider(),
+          const _Divider(),
           _InfoRow(icon: Icons.person_outline, label: l.driverLabel, value: driver.name),
-          _Divider(),
+          const _Divider(),
           _InfoRow(icon: Icons.phone_outlined, label: l.phone, value: driver.phone),
-          _Divider(),
+          const _Divider(),
           _InfoRow(icon: Icons.location_on_outlined, label: l.destination, value: driver.destination),
-          _Divider(),
+          const _Divider(),
           _InfoRow(icon: Icons.event_seat_outlined, label: l.seats, value: '${driver.seatsTotal} ${l.seatsAvailable}'),
         ],
       ),
@@ -455,6 +462,67 @@ class _LineCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Error view ───────────────────────────────────────────────────────────────
+
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.appColors;
+    final l = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.red.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.red, width: 1.5),
+              ),
+              child: const Icon(Icons.error_outline_rounded,
+                  color: AppColors.red, size: 32),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: c.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 48,
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: Text(l.retry),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
             ),
           ],
         ),

@@ -259,14 +259,14 @@ class _ThemeSelector extends StatelessWidget {
           child: Column(
             children: [
               _ThemeOption(
-                icon: Icons.wb_sunny_rounded,
+                icon: Icons.light_mode_outlined,
                 label: l.themeDay,
                 selected: current == ThemeMode.light,
                 onTap: () => notifier.setTheme(ThemeMode.light),
               ),
               Divider(height: 1, color: c.border),
               _ThemeOption(
-                icon: Icons.nights_stay_rounded,
+                icon: Icons.dark_mode_outlined,
                 label: l.themeNight,
                 selected: current == ThemeMode.dark,
                 onTap: () => notifier.setTheme(ThemeMode.dark),
