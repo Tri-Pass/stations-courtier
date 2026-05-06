@@ -179,9 +179,9 @@ class AppLocalizations {
 
   String get theme       => _t('Thème', 'السمة');
 
-  String get themeDay    => _t('Mode jour ☀️', 'وضع النهار ☀️');
+  String get themeDay    => _t('Mode jour️', 'وضع النهار');
 
-  String get themeNight  => _t('Mode nuit 🌙', 'وضع الليل 🌙');
+  String get themeNight  => _t('Mode nuit', 'وضع الليل');
 
   String get about => _t('À propos', 'حول');
 
