@@ -63,7 +63,6 @@ class SocketServiceOptions {
 
 // ─── Internals ─────────────────────────────────────────────────────────────────
 const _kHeartbeatTimeout = Duration(minutes: 11);
-const _kPingInterval     = Duration(seconds: 10);
 
 // ─── Logger ───────────────────────────────────────────────────────────────────
 void _log(String msg) => debugPrint('[Socket] $msg');
@@ -105,7 +104,6 @@ class SocketService with WidgetsBindingObserver {
 
   // ── Timers ────────────────────────────────────────────────────────────────
   Timer? _heartbeatTimer;
-  Timer? _pingTimer;
   Timer? _handshakeTimer;
   int?   _pendingHandshakeCid;
 
@@ -186,7 +184,6 @@ class SocketService with WidgetsBindingObserver {
     _clearReconnectTimer();
     _clearHeartbeat();
     _clearHandshakeTimer();
-    _stopPing();
     _pendingHandshakeCid = null;
     _activeChans.clear();
     _ws?.sink.close();
@@ -233,14 +230,13 @@ class SocketService with WidgetsBindingObserver {
         _inBackground = true;
         _clearReconnectTimer();
         _clearHeartbeat();
-        _stopPing();
 
       case AppLifecycleState.resumed:
         _inBackground = false;
         if (!_destroyed) {
           if (isConnected) {
-            _log('📱 resumed — already connected, restarting ping');
-            _startPing();
+            _log('📱 resumed — already connected');
+            _resetHeartbeat();
           } else {
             _log('📱 resumed — not connected, reconnecting immediately');
             _clearReconnectTimer();
@@ -263,7 +259,6 @@ class SocketService with WidgetsBindingObserver {
 
     _log('🔌 _openSocket() — url=${_options!.url} attempt=$_attempts status=${_status.name}');
 
-    _stopPing();
     _ws?.sink.close();
     _ws = null;
 
@@ -314,7 +309,6 @@ class SocketService with WidgetsBindingObserver {
 
   void _onDone() {
     _log('🔴 WebSocket closed — status=${_status.name} attempts=$_attempts destroyed=$_destroyed');
-    _stopPing();
     _clearHeartbeat();
     _activeChans.clear();
 
@@ -329,26 +323,26 @@ class SocketService with WidgetsBindingObserver {
   // ═════════════════════════════════════════════════════════════════════════
 
   void _onMessage(dynamic raw) {
-    if (raw == '#1') {
-      _log('🏓 server raw ping (#1) → sending pong (#2)');
-      _ws?.sink.add('#2');
+    // ── Server ping: empty frame or #1 → echo back immediately ────────────
+    // The server sends either an empty string or "#1" as its keepalive ping.
+    // We ONLY echo it back — we never initiate our own pings.
+    // Sending our own #1 alongside the server's #1 causes a collision that
+    // makes the server close the connection.
+    if (raw == null || raw == '' || raw == '#1') {
+      _log('💓 server ping → ponging back');
+      _ws?.sink.add(raw == '#1' ? '#1' : '');
       _resetHeartbeat();
       return;
     }
 
+    // ── Server pong reply (if server ever sends #2) ────────────────────────
     if (raw == '#2') {
-      _log('🏓 server pong (#2) — connection alive ✅');
+      _log('💓 server pong (#2) — connection alive ✅');
       _resetHeartbeat();
       return;
     }
 
-    if (raw == null || (raw is String && raw.trim().isEmpty)) {
-      _log('📭 empty frame (server ping) → sending #2 pong');
-      _ws?.sink.add('#2');
-      _resetHeartbeat();
-      return;
-    }
-
+    // Log every raw incoming frame (truncated to 500 chars)
     final preview = raw.toString().length > 500
         ? '${raw.toString().substring(0, 500)}…'
         : raw.toString();
@@ -368,6 +362,7 @@ class SocketService with WidgetsBindingObserver {
     final cid    = frame['cid']    as int?;
     final action = frame['action'] as String?;
 
+    // ── Custom action-based publish ────────────────────────────────────────
     if (action == 'publish') {
       final channel = frame['channel'] as String?;
       _log('📨 action=publish channel="$channel" data=$data');
@@ -375,6 +370,7 @@ class SocketService with WidgetsBindingObserver {
       return;
     }
 
+    // ── Handshake ACK ──────────────────────────────────────────────────────
     if (event == null && rid != null && rid == _pendingHandshakeCid) {
       _clearHandshakeTimer();
       _pendingHandshakeCid = null;
@@ -385,18 +381,19 @@ class SocketService with WidgetsBindingObserver {
       _log('✅ handshake ACK — socketId=$socketId isAuthenticated=$isAuth');
       _options?.onAuthResult?.call(isAuth, socketId);
       _setStatus(SocketConnectionStatus.connected);
-      _startPing();
       _resubscribeAll();
       _flushQueue();
       return;
     }
 
+    // ── Generic ACK ────────────────────────────────────────────────────────
     if (event == null && rid != null) {
       _log('✉️ ACK rid=$rid');
       _resetHeartbeat();
       return;
     }
 
+    // ── Named events ──────────────────────────────────────────────────────
     switch (event) {
       case '#ping':
         _log('🏓 server #ping → #pong');
@@ -416,6 +413,8 @@ class SocketService with WidgetsBindingObserver {
 
       case '#removeAuthToken':
         _log('🔑 #removeAuthToken (SC auth cleared — keeping local JWT)');
+    // Do NOT null _options?.authToken here.
+    // Nulling it causes every reconnect to send authToken=null.
 
       default:
         if (event != null) {
@@ -545,33 +544,6 @@ class SocketService with WidgetsBindingObserver {
   void _clearReconnectTimer() {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
-  }
-
-  // ═════════════════════════════════════════════════════════════════════════
-  // KEEPALIVE PING
-  // ═════════════════════════════════════════════════════════════════════════
-
-  void _startPing() {
-    _stopPing();
-    final socketAtStart = _ws;
-    _log('💓 ping started (every ${_kPingInterval.inSeconds}s)');
-    _pingTimer = Timer.periodic(_kPingInterval, (_) {
-      if (_ws != socketAtStart || !isConnected) {
-        _log('💓 ping stale socket — stopping');
-        _stopPing();
-        return;
-      }
-      _log('💓 sending raw keepalive #1');
-      _ws?.sink.add('#1');
-    });
-  }
-
-  void _stopPing() {
-    if (_pingTimer != null) {
-      _log('💓 ping stopped');
-      _pingTimer?.cancel();
-      _pingTimer = null;
-    }
   }
 
   // ═════════════════════════════════════════════════════════════════════════
