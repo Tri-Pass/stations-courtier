@@ -12,8 +12,10 @@ import 'package:courtier/core/services/sunmi_nfc_service.dart';
 import 'package:courtier/core/storage/local_storage.dart';
 import 'package:courtier/core/theme/app_font_sizes.dart';
 import 'package:courtier/core/theme/app_theme.dart';
+import 'package:courtier/core/widgets/connectivity_wrapper.dart';
 import 'package:courtier/features/auth/domain/repositories/auth_repository.dart';
 import 'package:courtier/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:courtier/features/queue/presentation/bloc/queue_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -63,8 +65,10 @@ class _TaxiDriverAppState extends State<TaxiDriverApp> {
     }
   }
 
+  void _reloadPage() => sl<QueueBloc>().add(QueueRefresh());
+
   void _startNfc() {
-    if (_nfcSub != null) return; // already running
+    if (_nfcSub != null) return;
     SunmiNfcService.ensureInitialized();
     SunmiNfcService.startScanning();
     _nfcSub = SunmiNfcService.allEventsStream().listen((event) {
@@ -130,7 +134,10 @@ class _TaxiDriverAppState extends State<TaxiDriverApp> {
                 data: MediaQuery.of(context).copyWith(
                   textScaler: const TextScaler.linear(AppFontSizes.scale),
                 ),
-                child: child!,
+                child: ConnectivityWrapper(
+                  onRestored: _reloadPage,
+                  child: child!,
+                ),
               ),
             ),
           ),
