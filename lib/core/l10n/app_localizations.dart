@@ -475,6 +475,15 @@ class AppLocalizations {
   String get otpInvalid          => _t('Code OTP invalide ou expiré', 'رمز OTP غير صالح أو منتهي');
   String get nfcAlreadyLinked    => _t('Ce badge est déjà utilisé', 'هذه الشارة مستخدمة بالفعل');
   String get sendOtpBtn          => _t('Envoyer OTP', 'إرسال OTP');
+
+  // ── Connectivity ─────────────────────────────────────────────────────────────
+  String get noConnectionTitle =>
+      _t('Pas de connexion internet', 'لا يوجد اتصال بالإنترنت');
+
+  String get noConnectionBanner =>
+      _t('Vérification de la connexion…', 'جارٍ التحقق من الاتصال…');
+
+  String get connectionRestored => _t('Connexion rétablie', 'تم استعادة الاتصال');
 }
 
 class _AppLocalizationsDelegate

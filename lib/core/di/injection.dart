@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:courtier/core/l10n/locale_notifier.dart';
 import 'package:courtier/core/network/api_client.dart';
+import 'package:courtier/core/network/connectivity_service.dart';
 import 'package:courtier/core/network/socket_service.dart';
 import 'package:courtier/core/storage/local_storage.dart';
 import 'package:courtier/core/theme/theme_notifier.dart';
@@ -31,6 +32,7 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton(() => LocalStorage());
   sl.registerLazySingleton(() => ApiClient(sl()));
   sl.registerLazySingleton(() => SocketService.getInstance());
+  sl.registerLazySingleton(() => ConnectivityService());
 
   // Auth feature
   sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSource(sl()));
@@ -43,5 +45,5 @@ Future<void> setupDependencies() async {
   // Queue feature
   sl.registerLazySingleton(() => QueueRemoteDataSource(sl()));
   sl.registerLazySingleton<QueueRepository>(() => QueueRepositoryImpl(sl()));
-  sl.registerFactory(() => QueueBloc(sl(), sl(), sl()));
+  sl.registerLazySingleton(() => QueueBloc(sl(), sl(), sl()));
 }

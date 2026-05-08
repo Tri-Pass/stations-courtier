@@ -16,8 +16,8 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<QueueBloc>()..add(QueueLoad()),
+    return BlocProvider.value(
+      value: sl<QueueBloc>(),
       child: const _HomeView(),
     );
   }
@@ -95,8 +95,10 @@ class _HomeViewState extends State<_HomeView>
   @override
   void initState() {
     super.initState();
-    _tabController =
-        TabController(length: 3, vsync: this, initialIndex: 1);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
+    Future.microtask(() {
+      if (mounted) context.read<QueueBloc>().add(QueueLoad());
+    });
   }
 
   @override

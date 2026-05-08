@@ -116,31 +116,31 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // ── NFC badge ──────────────────────────────
-                            Center(
-                              child: Container(
-                                width: 64,
-                                height: 64,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.12),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: AppColors.primary, width: 1.5),
-                                ),
-                                child: const Icon(Icons.nfc,
-                                    color: AppColors.primary, size: 32),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Center(
-                              child: Text(
-                                l.nfcIdentified,
-                                style: TextStyle(
-                                    color: c.textSecondary,
-                                    fontSize: 12,
-                                    letterSpacing: 0.4),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
+                            // Center(
+                            //   child: Container(
+                            //     width: 64,
+                            //     height: 64,
+                            //     decoration: BoxDecoration(
+                            //       color: AppColors.primary.withValues(alpha: 0.12),
+                            //       shape: BoxShape.circle,
+                            //       border: Border.all(
+                            //           color: AppColors.primary, width: 1.5),
+                            //     ),
+                            //     child: const Icon(Icons.nfc,
+                            //         color: AppColors.primary, size: 32),
+                            //   ),
+                            // ),
+                            // const SizedBox(height: 6),
+                            // Center(
+                            //   child: Text(
+                            //     l.nfcIdentified,
+                            //     style: TextStyle(
+                            //         color: c.textSecondary,
+                            //         fontSize: 12,
+                            //         letterSpacing: 0.4),
+                            //   ),
+                            // ),
+                            // const SizedBox(height: 20),
 
                             // ── Driver info card ───────────────────────
                             _DriverCard(driver: _driver!, l: l),
