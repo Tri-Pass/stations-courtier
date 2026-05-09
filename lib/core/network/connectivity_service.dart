@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 enum ConnectivityState { checking, online, offline }
 
 class ConnectivityService {
-  // Fast socket check — no HTTP overhead, fails/succeeds in <100 ms on real
-  // connections and hits the timeout only when completely unreachable.
+  // Socket check confirms real internet access, not just an adapter being up.
   static const _host    = '8.8.8.8';
   static const _port    = 53;
   static const _timeout = Duration(seconds: 3);
@@ -20,9 +20,28 @@ class ConnectivityService {
   ValueNotifier<ConnectivityState> get state => _state;
 
   Timer? _timer;
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
 
   ConnectivityService() {
-    _check();
+    _init();
+  }
+
+  Future<void> _init() async {
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen(_onConnectivityChanged);
+    await _check();
+  }
+
+  void _onConnectivityChanged(List<ConnectivityResult> results) {
+    _timer?.cancel();
+    if (results.isEmpty || results.every((r) => r == ConnectivityResult.none)) {
+      _state.value = ConnectivityState.offline;
+      _scheduleNext();
+    } else {
+      // Adapter is up — verify actual internet with a socket probe.
+      _check();
+    }
   }
 
   Future<void> recheck() async {
@@ -51,6 +70,7 @@ class ConnectivityService {
 
   void dispose() {
     _timer?.cancel();
+    _subscription?.cancel();
     _state.dispose();
   }
 }
