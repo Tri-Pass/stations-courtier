@@ -444,6 +444,12 @@ class AppLocalizations {
 
   String get lineRequired => _t('Veuillez sélectionner une ligne', 'يرجى اختيار الخط');
 
+  String get alreadyInQueue => _t('Déjà dans la file d\'attente', 'موجود في الطابور');
+
+  String get alreadyInQueueSub => _t('Ce chauffeur est déjà enregistré dans la file d\'attente', 'هذا السائق مسجل بالفعل في قائمة الانتظار');
+
+  String get close => _t('Fermer', 'إغلاق');
+
   // ── Bottom nav ───────────────────────────────────────────────────────────
   String get navQueue   => _t('File', 'الطابور');
   String get navLinkNfc => _t('Lier NFC', 'ربط NFC');
