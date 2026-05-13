@@ -107,143 +107,207 @@ class _NfcConfirmPageState extends State<NfcConfirmPage> {
               ? _error != null
                   ? _ErrorView(message: _error!, onRetry: _loadData)
                   : const SizedBox.shrink()
-              : Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // ── NFC badge ──────────────────────────────
-                            // Center(
-                            //   child: Container(
-                            //     width: 64,
-                            //     height: 64,
-                            //     decoration: BoxDecoration(
-                            //       color: AppColors.primary.withValues(alpha: 0.12),
-                            //       shape: BoxShape.circle,
-                            //       border: Border.all(
-                            //           color: AppColors.primary, width: 1.5),
-                            //     ),
-                            //     child: const Icon(Icons.nfc,
-                            //         color: AppColors.primary, size: 32),
-                            //   ),
-                            // ),
-                            // const SizedBox(height: 6),
-                            // Center(
-                            //   child: Text(
-                            //     l.nfcIdentified,
-                            //     style: TextStyle(
-                            //         color: c.textSecondary,
-                            //         fontSize: 12,
-                            //         letterSpacing: 0.4),
-                            //   ),
-                            // ),
-                            // const SizedBox(height: 20),
-
-                            // ── Driver info card ───────────────────────
-                            _DriverCard(driver: _driver!, l: l),
-                            const SizedBox(height: 24),
-
-                            // ── Section header ─────────────────────────
-                            Row(
+              : _driver!.alreadyQueued
+                  ? _AlreadyQueuedView(driver: _driver!, l: l, c: c)
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Container(
-                                  width: 3,
-                                  height: 16,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  l.selectLine,
-                                  style: TextStyle(
-                                    color: c.textPrimary,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                                const Spacer(),
-                                if (_lines.isNotEmpty)
-                                  Text(
-                                    '${_lines.length} ${l.lineLabel.toLowerCase()}s',
-                                    style: TextStyle(
-                                      color: c.textSecondary,
-                                      fontSize: 12,
+                                _DriverCard(driver: _driver!, l: l),
+                                const SizedBox(height: 24),
+
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 3,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      l.selectLine,
+                                      style: TextStyle(
+                                        color: c.textPrimary,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    if (_lines.isNotEmpty)
+                                      Text(
+                                        '${_lines.length} ${l.lineLabel.toLowerCase()}s',
+                                        style: TextStyle(
+                                          color: c.textSecondary,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+
+                                if (_lines.isEmpty)
+                                  const _EmptyLines()
+                                else
+                                  ...(_lines.map((line) => _LineCard(
+                                        line: line,
+                                        isSelected: _selectedLine?.id == line.id,
+                                        onTap: () => setState(
+                                            () => _selectedLine = line),
+                                      ))),
+                                const SizedBox(height: 8),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                          ),
+                        ),
 
-                            // ── Line cards ─────────────────────────────
-                            if (_lines.isEmpty)
-                              const _EmptyLines()
-                            else
-                              ...(_lines.map((line) => _LineCard(
-                                    line: line,
-                                    isSelected: _selectedLine?.id == line.id,
-                                    onTap: () => setState(
-                                        () => _selectedLine = line),
-                                  ))),
-                            const SizedBox(height: 8),
-                          ],
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                          decoration: BoxDecoration(
+                            color: c.background,
+                            border: Border(top: BorderSide(color: c.border)),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 52,
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _adding ? null : _addToQueue,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.black,
+                                    disabledBackgroundColor:
+                                        AppColors.primary.withValues(alpha: 0.4),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14)),
+                                    elevation: 0,
+                                  ),
+                                  child: _adding
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.black),
+                                        )
+                                      : Text(l.addToQueue,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15)),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => context.go('/home'),
+                                child: Text(l.cancel,
+                                    style: TextStyle(color: c.textSecondary)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+    );
+  }
+}
+
+// ─── Already queued view ──────────────────────────────────────────────────────
+
+class _AlreadyQueuedView extends StatelessWidget {
+  final NfcDriverInfo driver;
+  final AppLocalizations l;
+  final AppColorsScheme c;
+  const _AlreadyQueuedView({required this.driver, required this.l, required this.c});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _DriverCard(driver: driver, l: l),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.teal.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.teal.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: AppColors.teal.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.playlist_add_check_rounded,
+                            color: AppColors.teal, size: 34),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        l.alreadyInQueue,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.teal,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.2,
                         ),
                       ),
-                    ),
-
-                    // ── Fixed bottom action ────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                      decoration: BoxDecoration(
-                        color: c.background,
-                        border: Border(top: BorderSide(color: c.border)),
+                      const SizedBox(height: 6),
+                      Text(
+                        l.alreadyInQueueSub,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: c.textSecondary,
+                          fontSize: 13,
+                          height: 1.5,
+                        ),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            height: 52,
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _adding ? null : _addToQueue,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.black,
-                                disabledBackgroundColor:
-                                    AppColors.primary.withValues(alpha: 0.4),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14)),
-                                elevation: 0,
-                              ),
-                              child: _adding
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.black),
-                                    )
-                                  : Text(l.addToQueue,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15)),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => context.go('/home'),
-                            child: Text(l.cancel,
-                                style: TextStyle(color: c.textSecondary)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SizedBox(
+            height: 52,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => context.go('/home'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.teal,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
+              ),
+              child: Text(
+                l.close,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

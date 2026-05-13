@@ -112,6 +112,7 @@ class NfcDriverInfo {
   final String phone;
   final String destination;
   final int seatsTotal;
+  final bool alreadyQueued;
 
   const NfcDriverInfo({
     required this.id,
@@ -120,6 +121,7 @@ class NfcDriverInfo {
     required this.phone,
     required this.destination,
     required this.seatsTotal,
+    this.alreadyQueued = false,
   });
 
   factory NfcDriverInfo.fromJson(Map<String, dynamic> j) => NfcDriverInfo(
@@ -129,5 +131,6 @@ class NfcDriverInfo {
         phone: (j['phone'] ?? '') as String,
         destination: (j['destination'] ?? '') as String,
         seatsTotal: (j['seatsTotal'] as num?)?.toInt() ?? 6,
+        alreadyQueued: (j['alreadyQueued'] as bool?) ?? false,
       );
 }
